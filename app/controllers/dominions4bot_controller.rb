@@ -1,14 +1,7 @@
 class Dominions4botController < Telegram::Bot::UpdatesController
   include Telegram::Bot::UpdatesController::MessageContext
-  # before_action :connect_db
-  # before_action :set_character, except: [:inline_keyboard, :keyboard]
-  # before_action :set_msg, except: [:set_pg, :callback_query]
-
-  # require 'active_record'
-  # require 'sqlite3'
   require 'byebug'
-  # context_to_action!
-
+  
   NUMERICAL_KEYBOARD = [
         ["1", "2", "3"],
         ["4", "5", "6"],
@@ -16,6 +9,11 @@ class Dominions4botController < Telegram::Bot::UpdatesController
         ["0"]
       ]
   
+
+  NATIONS = {"Rag" => "Ragha", "Jom" => "Jomon", "Ut" => "Utgard", "Bog" => "Bogarus", "Rl" => "R'lyeh", "Lem" => "Lemuria", "Rap" => "Caelum", "BK" => "C'Tis", "DT" => "T'ien Ch'i"    }
+
+
+
 
   def callback_query(data)
     order = data.split
@@ -25,67 +23,40 @@ class Dominions4botController < Telegram::Bot::UpdatesController
 
   def status_1024!
     status = ''    
+    lines = File.readlines("/tmp/dominions4/1024.log", chomp: true).last(2)
+    status << lines.first
+    lines[1].scan(/([A-Z]{1,2}[a-z]{0,}[-+])/).each do |player|
+      player_name = player.last[0...-1]
+      status << "\n *#{nation_name(player_name)}:* #{player.last.last.last == "+" ? "Turno jugado" : "Pendiente"}"
+    end
 
-    File.readlines("/tmp/dominions4/1024.log").last(2).each do |line|
-      status << line
-    end    
-    respond_with :message, text: status
+    respond_with :message, text: status, parse_mode: :Markdown
 
   end
 
   def status_1025!
     status = ''    
+    lines = File.readlines("/tmp/dominions4/1025.log", chomp: true).last(2)
+    status << lines.first
+    lines[1].scan(/([A-Z]{1,2}[a-z]{0,}[-+])/).each do |player|
+      player_name = player.last[0...-1]
+      status << "\n *#{nation_name(player_name)}:* #{player.last.last.last == "+" ? "Turno jugado" : "Pendiente"}"
+    end
 
-    File.readlines("/tmp/dominions4/1025.log").last(2).each do |line|
-      status << line
-    end    
-    respond_with :message, text: status
+    respond_with :message, text: status, parse_mode: :Markdown
 
   end
 
-
-  # def message(message)
-  #   respond_with :message, text: t('.content', text: message['text'])
-  # end
-
-  # def inline_query(query, _offset)
-  #   query = query.first(10) # it's just an example, don't use large queries.
-  #   t_description = t('.description')
-  #   t_content = t('.content')
-  #   results = Array.new(5) do |i|
-  #     {
-  #       type: :article,
-  #       title: "#{query}-#{i}",
-  #       id: "#{query}-#{i}",
-  #       description: "#{t_description} #{i}",
-  #       input_message_content: {
-  #         message_text: "#{t_content} #{i}",
-  #       },
-  #     }
-  #   end
-  #   answer_inline_query results
-  # end
-
-  # # As there is no chat id in such requests, we can not respond instantly.
-  # # So we just save the result_id, and it's available then with `/last_chosen_inline_result`.
-  # def chosen_inline_result(result_id, _query)
-  #   session[:last_chosen_inline_result] = result_id
-  # end
-
-  # def last_chosen_inline_result
-  #   result_id = session[:last_chosen_inline_result]
-  #   if result_id
-  #     respond_with :message, text: t('.selected', result_id: result_id)
-  #   else
-  #     respond_with :message, text: t('.prompt')
-  #   end
-  # end
-
+  
   def action_missing(action, *_args)
     respond_with :message, text: "Eso no se que es" 
   end
 
   private
+
+  def nation_name(acron)
+    NATIONS[acron] || acron
+  end
 
   def connect_db
     unless ActiveRecord::Base.connected?
