@@ -56,11 +56,11 @@ class Dominions4botController < Telegram::Bot::UpdatesController
 
   def status_1024!
     game_status = ''    
-    lines = File.readlines("/tmp/dominions4/1024.log", chomp: true).last(2)
+    lines = File.readlines("/tmp/1024.log", chomp: true).last(2)
     game_status << lines.first
     lines[1].scan(/([A-Z]{1,2}[a-z]{0,}[-?*+])/).each do |player|
       nation = player.last[0...-1]
-      pg = PlayerGame.find_by nation: nation
+      pg = PlayerGame.find_by nation: nation, game: 1024
       nation_status =  player_status(player.last.last.last)
       unless pg.nil? || nation_status == "Jugado"
         nation += " @#{pg.username}" 
@@ -74,11 +74,11 @@ class Dominions4botController < Telegram::Bot::UpdatesController
 
   def status_1025!
     game_status = ''    
-    lines = File.readlines("/tmp/dominions4/1025.log", chomp: true).last(2)
+    lines = File.readlines("/tmp/1025.log", chomp: true).last(2)
     game_status << lines.first
     lines[1].scan(/([A-Z]{1,2}[a-z]{0,}[-?*+])/).each do |player|
       nation = player.last[0...-1]
-      pg = PlayerGame.find_by nation: nation
+      pg = PlayerGame.find_by nation: nation, game: 1025
       nation_status =  player_status(player.last.last.last)
       unless pg.nil? || nation_status == "Jugado"
         nation += " @#{pg.username}" 
@@ -104,7 +104,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
   private
 
   def playing_nations game
-    lines = File.readlines("/tmp/dominions4/#{game}.log", chomp: true).last(2)
+    lines = File.readlines("/tmp/#{game}.log", chomp: true).last(2)
     players = []
     lines[1].scan(/([A-Z]{1,2}[a-z]{0,}[-?*+])/).each do |player| players << player.last[0...-1]
     end
