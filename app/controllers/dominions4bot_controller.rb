@@ -62,7 +62,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     game_status = ''
     lines = File.readlines("/tmp/#{port}.log", chomp: true).last(2)
     game_status << lines.first
-    lines[1].scan(/([A-Z]{1,2}[a-z]{0,}[-?*+])/).each do |player|
+    lines[1].scan(/([A-Za-z]{1,2}[a-z]{0,}[-?*+])/).each do |player|
       nation = player.last[0...-1]
       pg = PlayerGame.find_by nation: nation, game: port
       nation_status =  player_status(player.last.last.last)
