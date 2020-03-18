@@ -57,6 +57,10 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     self.im_playing_in 1026
   end
 
+  def im_playing_in_1027!
+    self.im_playing_in 1027
+  end
+
 
   def status(port)
     game_status = ''
@@ -86,6 +90,10 @@ class Dominions4botController < Telegram::Bot::UpdatesController
 
   def status_1026!
     self.status 1026
+  end
+
+  def status_1027!
+    self.status 1027
   end
 
   def read_dat_map
