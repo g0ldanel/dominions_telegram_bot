@@ -1,6 +1,6 @@
 class Dominions4botController < Telegram::Bot::UpdatesController
   include Telegram::Bot::UpdatesController::MessageContext
-  include MapUtils
+  #include MapUtils
   require 'byebug'
   before_action :connect_db
   before_action :set_username
