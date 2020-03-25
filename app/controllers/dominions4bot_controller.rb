@@ -1,5 +1,6 @@
 class Dominions4botController < Telegram::Bot::UpdatesController
   include Telegram::Bot::UpdatesController::MessageContext
+  include MapUtils
   require 'byebug'
   before_action :connect_db
   before_action :set_username
@@ -57,8 +58,12 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     self.im_playing_in 1026
   end
 
+
   def im_playing_in_1027!
     self.im_playing_in 1027
+  end
+  def im_playing_in_1028!
+    self.im_playing_in 1028
   end
 
 
@@ -94,6 +99,10 @@ class Dominions4botController < Telegram::Bot::UpdatesController
 
   def status_1027!
     self.status 1027
+  end
+
+  def status_1028!
+    self.status 1028
   end
 
   def read_dat_map
