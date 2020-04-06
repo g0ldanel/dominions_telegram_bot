@@ -1,3 +1,4 @@
+# coding: utf-8
 class Dominions4botController < Telegram::Bot::UpdatesController
   include Telegram::Bot::UpdatesController::MessageContext
   #include MapUtils
@@ -46,24 +47,16 @@ class Dominions4botController < Telegram::Bot::UpdatesController
   end
 
 
-  def im_playing_in_1024!
-    self.im_playing_in 1024
-  end
+  PORTS = [1024..1028]
 
-  def im_playing_in_1025!
-    self.im_playing_in 1025
-  end
+  PORTS.each do |i|
+    define_method("im_playing_in_#{i}!") do
+      self.public_send("im_playing_in", i)
+    end
 
-  def im_playing_in_1026!
-    self.im_playing_in 1026
-  end
-
-
-  def im_playing_in_1027!
-    self.im_playing_in 1027
-  end
-  def im_playing_in_1028!
-    self.im_playing_in 1028
+    define_method("status_#{i}!") do
+      self.public_send("status", i)
+    end
   end
 
 
@@ -82,27 +75,6 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     end
 
     respond_with :message, text: game_status, parse_mode: :Markdown
-
-  end
-
-  def status_1024!
-    self.status 1024
-  end
-
-  def status_1025!
-    self.status 1025
-  end
-
-  def status_1026!
-    self.status 1026
-  end
-
-  def status_1027!
-    self.status 1027
-  end
-
-  def status_1028!
-    self.status 1028
   end
 
   def read_dat_map
@@ -132,50 +104,50 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     end
   end
 
-  def player_status(status)
-    case(status)
-    when "+"
-      "Jugado"
-    when "?"
-      "A medias"
-    when "-"
-      "Pendiente"
-    when "*"
-      "*Conectado*"
-    else
-      status
-    end
-  end
+   def player_status(status)
+     case(status)
+     when "+"
+       "Jugado"
+     when "?"
+       "A medias"
+     when "-"
+       "Pendiente"
+     when "*"
+       "*Conectado*"
+     else
+       status
+     end
+   end
 
-  def nation_name(acron)
-    NATIONS[acron] || acron
-  end
+   def nation_name(acron)
+     NATIONS[acron] || acron
+   end
 
-  def connect_db
-    unless ActiveRecord::Base.connected?
-      ActiveRecord::Base.establish_connection(adapter:  'sqlite3', database: 'db/development.sqlite3')
-    end
-  end
+   def connect_db
+     unless ActiveRecord::Base.connected?
+       ActiveRecord::Base.establish_connection(adapter:  'sqlite3', database: 'db/development.sqlite3')
+     end
+   end
 
-  def set_msg
-    @msg =  update["message"]["from"]["text"] || update["message"]["text"]
-    if (@msg =~ /[ ]/).nil? then
-      @msg = nil
-    else
-      @msg = @msg[((@msg =~ /[ ]/) + 1)..@msg.length]
-    end
+   def set_msg
+     @msg =  update["message"]["from"]["text"] || update["message"]["text"]
+     if (@msg =~ /[ ]/).nil? then
+       @msg = nil
+     else
+       @msg = @msg[((@msg =~ /[ ]/) + 1)..@msg.length]
+     end
 
-  end
+   end
 
-  def is_number? string
-    true if Float(string) rescue false
-  end
+   def is_number? string
+     true if Float(string) rescue false
+   end
 
-  def set_username
-    begin
-      @username =  update["message"]["from"]["username"]
-    rescue
-      @username =  update["callback_query"]["from"]["username"]
-    end
-  end
+   def set_username
+     begin
+       @username =  update["message"]["from"]["username"]
+     rescue
+       @username =  update["callback_query"]["from"]["username"]
+     end
+   end
 end
