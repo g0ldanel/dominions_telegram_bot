@@ -1,7 +1,7 @@
 # coding: utf-8
 class Dominions4botController < Telegram::Bot::UpdatesController
   include Telegram::Bot::UpdatesController::MessageContext
-  #include MapUtils
+  include StatsUtils
   require 'byebug'
   before_action :connect_db
   before_action :set_username
@@ -47,7 +47,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
   end
 
 
-  PORTS = [1024..1028]
+  PORTS = (1024..1030).to_a
 
   PORTS.each do |i|
     define_method("im_playing_in_#{i}!") do
@@ -86,7 +86,9 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     respond_with :message, text: "Eso no se que es"
   end
 
-
+  def scores_1028!
+    respond_with :message, text: read_scores_file_1028, parse_mode: "html"
+  end
 
   private
 
