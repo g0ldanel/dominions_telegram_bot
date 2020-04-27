@@ -13,7 +13,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
       ]
 
 
-  NATIONS = {"Rag" => "Ragha", "Jom" => "Jomon", "Ut" => "Utgard", "Bog" => "Bogarus", "Rl" => "R'lyeh", "Lem" => "Lemuria", "Rap" => "Caelum", "DT" => "C'Tis", "BK" => "T'ien Ch'i"    }
+  NATIONS = {"Rag" => "Ragha", "Jom" => "Jomon", "Ut" => "Utgard", "Bog" => "Bogarus", "Rl" => "R'lyeh", "Lem" => "Lemuria", "Rap" => "Caelum", "DT" => "C'Tis", "BK" => "T'ien Ch'i" }
 
 
 
@@ -34,6 +34,11 @@ class Dominions4botController < Telegram::Bot::UpdatesController
   end
 
 
+
+  def pending_games!
+    games = PlayerGame.where(username: @username).map(&:game)
+    respond_with :message, text: "Hola #{@username}, jueguas en #{games.join(", ")}." # no muy útil aún
+  end
 
   def im_playing_in(port)
     players = playing_nations port
@@ -61,20 +66,17 @@ class Dominions4botController < Telegram::Bot::UpdatesController
 
 
   def status(port)
-    game_status = ''
-    lines = File.readlines("/tmp/#{port}.log", chomp: true).last(2)
-    game_status << lines.first
-    lines[1].scan(/([A-Za-z]{1,2}[a-z]{0,}[-?*+])/).each do |player|
-      nation = player.last[0...-1]
-      pg = PlayerGame.find_by nation: nation, game: port
-      nation_status =  player_status(player.last.last.last)
-      unless pg.nil? || nation_status == "Jugado"
-        nation += " @#{pg.username}"
-      end
-      game_status << "\n *#{nation_name(nation)}:* #{nation_status}"
+    description, matrix = get_full_status_for(port)
+    player_info = matrix.map do |player, (pg, status)|
+      player_name = if status == :played
+                      ""
+                    else
+                      " @#{player}"
+                    end
+      " *#{nation_name(pg.nation)}#{player_name}:* #{status_name(status)}"
     end
 
-    respond_with :message, text: game_status, parse_mode: :Markdown
+    respond_with :message, text: [description, player_info].join("\n "), parse_mode: :Markdown
   end
 
   def read_dat_map
@@ -109,12 +111,27 @@ class Dominions4botController < Telegram::Bot::UpdatesController
    def player_status(status)
      case(status)
      when "+"
-       "Jugado"
+       :played
      when "?"
-       "A medias"
+       :unfinished
      when "-"
-       "Pendiente"
+       :pending
      when "*"
+       :connected
+     else
+       status
+     end
+   end
+
+   def status_name(status)
+     case(status)
+     when :played
+       "Jugado"
+     when :unfinished
+       "A medias"
+     when :pending
+       "Pendiente"
+     when :connected
        "*Conectado*"
      else
        status
@@ -151,5 +168,18 @@ class Dominions4botController < Telegram::Bot::UpdatesController
      rescue
        @username =  update["callback_query"]["from"]["username"]
      end
+   end
+
+   def get_full_status_for(port)
+     # returns a hash {player: [pg, status]} and a description of the game
+     status_grid = {}
+     lines = File.readlines("/tmp/#{port}.log", chomp: true).last(2)
+     lines[1].scan(/([A-Za-z]{1,2}[a-z]{0,}[-?*+])/).each do |player|
+       nation = player.last[0...-1]
+       pg = PlayerGame.find_by nation: nation, game: port
+       nation_status =  player_status(player.last.last.last)
+       status_grid[pg.username] = [pg, nation_status] unless pg.nil?
+     end
+     [status_grid, lines.first]
    end
 end
