@@ -79,6 +79,19 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     respond_with :message, text: [description, player_info].join("\n "), parse_mode: :Markdown
   end
 
+  def status_for_player_everywhere(player)
+    status_per_port = PORTS.map do |p|
+      status_info, _ = get_full_status_for(p)
+      status = status_info[player]&.last
+      [p, status] if status
+    end.compact
+
+    text = ["#{player}, está jugando en las siguientes partidas:",
+            "En #{p} está #{status}"
+           ].join("\n ")
+    respond_with :message, text: text, parse_mode: :Markdown
+  end
+
   def read_dat_map
 
   end
