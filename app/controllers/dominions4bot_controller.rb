@@ -35,11 +35,6 @@ class Dominions4botController < Telegram::Bot::UpdatesController
 
 
 
-  def pending_games!
-    games = PlayerGame.where(username: @username).map(&:game)
-    respond_with :message, text: "Hola #{@username}, jueguas en #{games.join(", ")}." # no muy útil aún
-  end
-
   def im_playing_in(port)
     players = playing_nations port
     answers = []
@@ -66,7 +61,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
 
 
   def status(port)
-    description, matrix = get_full_status_for(port)
+    matrix, description = get_full_status_for(port)
     player_info = matrix.map do |player, (pg, status)|
       player_name = if status == :played
                       ""
