@@ -23,7 +23,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     end
 
     define_method("status_#{i}!") do
-      respond_with :message, text: status(i), parse_mode: :Markdown
+      respond_with :message, text: "Status #{i}:\n #{status(i)}", parse_mode: :Markdown
     end
   end
 
