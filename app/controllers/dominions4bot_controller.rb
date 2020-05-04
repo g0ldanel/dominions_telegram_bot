@@ -5,6 +5,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
   require 'byebug'
   before_action :connect_db
   before_action :set_username
+  before_action :set_player
   NUMERICAL_KEYBOARD = [
         ["1", "2", "3"],
         ["4", "5", "6"],
@@ -14,8 +15,17 @@ class Dominions4botController < Telegram::Bot::UpdatesController
 
 
   NATIONS = {"Rag" => "Ragha", "Jom" => "Jomon", "Ut" => "Utgard", "Bog" => "Bogarus", "Rl" => "R'lyeh", "Lem" => "Lemuria", "Rap" => "Caelum", "DT" => "C'Tis", "BK" => "T'ien Ch'i"    }
+  PORTS = (1024..1030).to_a
 
+  PORTS.each do |i|
+    define_method("im_playing_in_#{i}!") do
+      respond_with :message, text: "¿quién eres en #{i}?", reply_markup: {inline_keyboard:  im_playing_in(i)}
+    end
 
+    define_method("status_#{i}!") do
+      respond_with :message, text: status(i), parse_mode: :Markdown
+    end
+  end
 
 
   def callback_query(data)
@@ -27,38 +37,31 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     arr = player_game.split "@"
     nation = arr.first
     game = arr.last
-    pg = PlayerGame.find_or_create_by nation: nation, game: game
-    pg.username =  @username
+    pg = PlayerGame.find_or_create_by player: @username, game: game
+    pg.nation =  nation
     pg.save!
     respond_with :message, text: "Hola #{@username} eres #{nation} en #{game} "
   end
 
 
 
+  #tells the player in which games she/he has pending turns
+  def need_drugs!
+    drugs =[]
+    (1024..1030).each do |port|
+      game_arr = status(port).split("\n")
+      idx = find_player_status(game_arr)
+      drugs <<  game_arr[idx] unless idx.nil?
+    end
+
+    respond_with :message, text: drugs
+
+  end
+
   def im_playing_in(port)
     players = playing_nations port
-    answers = []
-    players.each do |player|
-      answers << [{text: "Soy #{player}", callback_data: "soy! #{player}@#{port}"}]
-    end
-
-    respond_with :message, text: "¿quién eres en #{port}?", reply_markup: {inline_keyboard:  answers}
-
+    players.each {|player| [{text: "Soy #{player}", callback_data: "soy! #{player}@#{port}"}]}
   end
-
-
-  PORTS = (1024..1030).to_a
-
-  PORTS.each do |i|
-    define_method("im_playing_in_#{i}!") do
-      self.public_send("im_playing_in", i)
-    end
-
-    define_method("status_#{i}!") do
-      self.public_send("status", i)
-    end
-  end
-
 
   def status(port)
     game_status = ''
@@ -73,13 +76,9 @@ class Dominions4botController < Telegram::Bot::UpdatesController
       end
       game_status << "\n *#{nation_name(nation)}:* #{nation_status}"
     end
-
-    respond_with :message, text: game_status, parse_mode: :Markdown
+    game_status
   end
 
-  def read_dat_map
-
-  end
 
 
   def action_missing(action, *_args)
@@ -92,12 +91,13 @@ class Dominions4botController < Telegram::Bot::UpdatesController
 
   private
 
+  def find_player_status(arr)
+    arr.index { |status| status.index @username != nil}
+  end
+
   def playing_nations game
     lines = File.readlines("/tmp/#{game}.log", chomp: true).last(2)
-    players = []
-    lines[1].scan(/([A-Z]{1,2}[a-z]{0,}[-?*+])/).each do |player| players << player.last[0...-1]
-    end
-    players
+    lines[1].scan(/([A-Z]{1,2}[a-z]{0,}[-?*+])/).map {|player| players << player.last[0...-1] }
   end
 
   def connect_db
@@ -138,7 +138,6 @@ class Dominions4botController < Telegram::Bot::UpdatesController
      else
        @msg = @msg[((@msg =~ /[ ]/) + 1)..@msg.length]
      end
-
    end
 
    def is_number? string
@@ -146,10 +145,12 @@ class Dominions4botController < Telegram::Bot::UpdatesController
    end
 
    def set_username
-     begin
-       @username =  update["message"]["from"]["username"]
-     rescue
-       @username =  update["callback_query"]["from"]["username"]
-     end
+     @username =  update["message"]["from"]["username"]
+   rescue
+     @username =  update["callback_query"]["from"]["username"] || "anonymous"
+   end
+
+   def set_player
+    @player = Player.find_or_create username: @username
    end
 end
