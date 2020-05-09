@@ -24,11 +24,14 @@ module GamesUtils
 
   def select_game!
     games = PORTS.map do |port|
-      [ {text: "Crear #{port}", callback_data: "create_game! #{port}"},
-        {text: "Borrar #{port}", callback_data: "delete_game! #{port}"}]
+      if Game.exists? port: port
+        [{text: "Borrar #{port}", callback_data: "delete_game! #{port}"},{text: '-', callback_data: 'nope'}]
+      else
+        [{text: '-', callback_data: 'nope'},{text: "Crear #{port}", callback_data: "create_game! #{port}"},]
+      end
     end
 
-    respond_with :message, text: "Selecciona:\nBorrar una partida del bot solo hara que deje de leer su estado_", reply_markup: {inline_keyboard:  games}
+    respond_with :message, text: "Selecciona:\n _Borrar una partida del bot solo hara que deje de leer su estado_", reply_markup: {inline_keyboard:  games}, parse_mode: :Markdown
   end
 
 
