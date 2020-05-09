@@ -39,7 +39,8 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     arr = player_game.split "@"
     nation = arr.first
     port = arr.last
-    pg = PlayerGame.find_or_create_by player: @username, "game.port" => port
+    game = Game.find_by port: port
+    pg = PlayerGame.find_or_create_by player: @player, game: game
     pg.nation =  nation
     pg.save!
     respond_with :message, text: "Hola #{@username} eres #{nation} en #{port} "
@@ -94,7 +95,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     game_status = ''
     lines = File.readlines("/tmp/#{port}.log", chomp: true).last(2)
     game_status << lines.first
-    lines[1].scan(/([A-Za-z]{1,2}[a-z]{0,}[-?*+])/).each do |nation_line|
+    lines[1].scan(/([A-Za-z]{1,2}[a-z]{0,2}[-?*+])/).each do |nation_line|
       nation = nation_line.last[0...-1]
 
       pgs = PlayerGame.joins(:game).where nation: nation, "games.port" => port
