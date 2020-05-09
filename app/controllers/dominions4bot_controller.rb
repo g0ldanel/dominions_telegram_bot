@@ -1,5 +1,6 @@
 # coding: utf-8
 class Dominions4botController < Telegram::Bot::UpdatesController
+  rescue_from Exception, :with => { Logger.new(STDOUT).error "\n********************\nUps! Exception raised, got: #{e.message}\n********************\n"}
   include Telegram::Bot::UpdatesController::MessageContext
   include StatsUtils
   require 'byebug'
