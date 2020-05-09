@@ -50,13 +50,11 @@ class Dominions4botController < Telegram::Bot::UpdatesController
 
   #tells the player in which games she/he has pending turns
   def need_drugs!
-    drugs = PORTS.map do |port|
-      unless status(port)
-        game_arr = status(port).split("\n")
-        idx = find_player_status(game_arr)
-        drugs <<  game_arr[idx] unless idx.nil?
-      end
-    end
+    pgs = PlayerGame.where player: @player
+    drugs = pgs.map do |pg|
+      port = pg.gm_port
+      ["#{port}: #{player_status(playing_nations(port))}"]
+    end.flatten.join "\n"
     respond_with :message, text: drugs
 
   end
@@ -65,29 +63,29 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     players = playing_nations port
 
     answers = players.map do |player|
-      [{text: "Soy #{player}", callback_data: "soy! #{player}@#{port}"}]
+      [{text: "Soy #{player[0...-1]}", callback_data: "soy! #{player[0...-1]}@#{port}"}]
     end
 
     respond_with :message, text: "¿quién eres en #{port}?", reply_markup: {inline_keyboard:  answers}
   end
 
 
-  #old
-  def status(port)
-    status = game_status port
+  # #old
+  # def status(port)
+  #   status = game_status port
 
-    game_players(port).scan(/([A-Za-z]{1,2}[a-z]{0,}[-?*+])/).each do |player|
-      nation = player.last[0...-1]
-      pg = PlayerGame.find_by nation: nation, game: port
-      nation_status =  player_status(player.last.last.last)
-      unless pg.nil? || nation_status == "Jugado"
-        nation += " @#{pg.username}"
-      end
-      status << "\n *#{nation_name(nation)}:* #{nation_status}"
-    end
+  #   game_players(port).scan(/([A-Za-z]{1,2}[a-z]{0,}[-?*+])/).each do |player|
+  #     nation = player.last[0...-1]
+  #     pg = PlayerGame.find_by nation: nation, game: port
+  #     nation_status =  player_status(player.last.last.last)
+  #     unless pg.nil? || nation_status == "Jugado"
+  #       nation += " @#{pg.username}"
+  #     end
+  #     status << "\n *#{nation_name(nation)}:* #{nation_status}"
+  #   end
 
-    respond_with :message, text: status, parse_mode: :Markdown
-  end
+  #   respond_with :message, text: status, parse_mode: :Markdown
+  # end
 
 
   #new
@@ -122,13 +120,15 @@ class Dominions4botController < Telegram::Bot::UpdatesController
 
   private
 
-  def find_player_status_index(arr)
-    arr.index { |status| status.index @username}
+  def find_nation_status(port, nation)
+    nations = playing_nations port
+    idx = nations.index {|current| current.start_with? nation}
+    player_status(nations[idx][-1])
   end
 
-  def playing_nations game
-    lines = File.readlines("/tmp/#{game}.log", chomp: true).last(2)
-    lines[1].scan(/([A-Z]{1,2}[a-z]{0,}[-?*+])/).map {|player| player.last[0...-1] }
+  def playing_nations port
+    lines = File.readlines("/tmp/#{port}.log", chomp: true).last(2)
+    lines[1].scan(/([A-Z]{1,2}[a-z]{0,}[-?*+])/).map {|player| player.last }
   end
 
   def connect_db
