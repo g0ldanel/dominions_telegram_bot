@@ -1,8 +1,10 @@
 # coding: utf-8
 class Dominions4botController < Telegram::Bot::UpdatesController
-  rescue_from Exception, :with => { Logger.new(STDOUT).error "\n********************\nUps! Exception raised, got: #{e.message}\n********************\n"}
+  rescue_from Exception, :with => :log_error
+  PORTS = (1024..1029).to_a
   include Telegram::Bot::UpdatesController::MessageContext
   include StatsUtils
+  include GamesUtils
   require 'byebug'
 
   before_action :connect_db
@@ -10,13 +12,12 @@ class Dominions4botController < Telegram::Bot::UpdatesController
   before_action :set_player
 
   NUMERICAL_KEYBOARD = [
-        ["1", "2", "3"],
-        ["4", "5", "6"],
-        ["7", "8", "9"],
-        ["0"]
-      ]
+    ["1", "2", "3"],
+    ["4", "5", "6"],
+    ["7", "8", "9"],
+    ["0"]
+  ]
   NATIONS = {"Rag" => "Ragha", "Jom" => "Jomon", "Ut" => "Utgard", "Bog" => "Bogarus", "Rl" => "R'lyeh", "Lem" => "Lemuria", "Rap" => "Caelum", "DT" => "C'Tis", "BK" => "T'ien Ch'i"    }
-  PORTS = (1024..1029).to_a
 
   PORTS.each do |i|
     define_method("im_playing_in_#{i}!") do
@@ -61,9 +62,34 @@ class Dominions4botController < Telegram::Bot::UpdatesController
 
   def im_playing_in(port)
     players = playing_nations port
-    players.each {|player| [{text: "Soy #{player}", callback_data: "soy! #{player}@#{port}"}]}
+
+    answers = players.map do |player|
+      [{text: "Soy #{player}", callback_data: "soy! #{player}@#{port}"}]
     end
 
+    respond_with :message, text: "¿quién eres en #{port}?", reply_markup: {inline_keyboard:  answers}
+  end
+
+
+  #old
+  def status(port)
+    status = game_status port
+
+    game_players(port).scan(/([A-Za-z]{1,2}[a-z]{0,}[-?*+])/).each do |player|
+      nation = player.last[0...-1]
+      pg = PlayerGame.find_by nation: nation, game: port
+      nation_status =  player_status(player.last.last.last)
+      unless pg.nil? || nation_status == "Jugado"
+        nation += " @#{pg.username}"
+      end
+      status << "\n *#{nation_name(nation)}:* #{nation_status}"
+    end
+
+    respond_with :message, text: status, parse_mode: :Markdown
+  end
+
+
+  #new
   def status(port)
     game_status = ''
     lines = File.readlines("/tmp/#{port}.log", chomp: true).last(2)
@@ -110,51 +136,57 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     end
   end
 
-   def player_status(status)
-     case(status)
-     when "+"
-       "Jugado"
-     when "?"
-       "A medias"
-     when "-"
-       "Pendiente"
-     when "*"
-       "*Conectado*"
-     else
-       status
-     end
+  def player_status(status)
+   case(status)
+   when "+"
+     "Jugado"
+   when "?"
+     "A medias"
+   when "-"
+     "Pendiente"
+   when "*"
+     "*Conectado*"
+   else
+     status
    end
+  end
 
-   def nation_name(acron)
-     NATIONS[acron] || acron
+  def nation_name(acron)
+   NATIONS[acron] || acron
+  end
+
+  def connect_db
+   unless ActiveRecord::Base.connected?
+     ActiveRecord::Base.establish_connection(adapter:  'sqlite3', database: 'db/development.sqlite3')
    end
+  end
 
-   def connect_db
-     unless ActiveRecord::Base.connected?
-       ActiveRecord::Base.establish_connection(adapter:  'sqlite3', database: 'db/development.sqlite3')
-     end
+  def set_msg
+   @msg =  update["message"]["from"]["text"] || update["message"]["text"]
+   if (@msg =~ /[ ]/).nil? then
+     @msg = nil
+   else
+     @msg = @msg[((@msg =~ /[ ]/) + 1)..@msg.length]
    end
+  end
 
-   def set_msg
-     @msg =  update["message"]["from"]["text"] || update["message"]["text"]
-     if (@msg =~ /[ ]/).nil? then
-       @msg = nil
-     else
-       @msg = @msg[((@msg =~ /[ ]/) + 1)..@msg.length]
-     end
-   end
+  def is_number? string
+   true if Float(string) rescue false
+  end
 
-   def is_number? string
-     true if Float(string) rescue false
-   end
+  def set_username
+    @username =  update["message"]["from"]["username"]
+  rescue
+    @username = update["callback_query"]['from']['username']
+  end
 
-   def set_username
-     @username =  update["message"]["from"]["username"]
-   rescue
-     @username = "No Telegram username"
-   end
-
-   def set_player
+  def set_player
     @player = Player.find_or_create_by username: @username
-   end
+  end
+
+  def log_error(e)
+    Logger.new(STDOUT).error "\n********************\nUps! Exception raised, got: #{e.message}\n********************\n"
+    respond_with :message, text: "Ups!\n\n```#{e.message}```\nNada que ver, circulen...", parse_mode: :Markdown
+  end
+
 end
