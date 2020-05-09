@@ -53,7 +53,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     pgs = PlayerGame.where player: @player
     drugs = pgs.map do |pg|
       port = pg.gm_port
-      ["#{port}: #{player_status(playing_nations(port))}"]
+      ["#{port}: #{find_nation_status(1024,pg.nation)}"]
     end.flatten.join "\n"
     respond_with :message, text: drugs
 
