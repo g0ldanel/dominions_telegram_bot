@@ -21,7 +21,6 @@ module GamesUtils
 
   def who_is_who(port)
     game = Game.find_by port: port
-byebug
     unless game.nil?
       answer = game.player_games.map do |pg|
         game_status << "*#{nation_name(pg.nation)}:* @#{pg.player.username}\n"
