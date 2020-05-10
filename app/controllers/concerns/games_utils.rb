@@ -6,7 +6,7 @@ module GamesUtils
   def select_game!
     games = PORTS.map do |port|
       if Game.exists? port: port
-        [{text: "Borrar #{port}", callback_data: "delete_game! #{port}"},{text: "Who is who in #{port}?", callback_data: "who_is_who #{port}" }]
+        [{text: "Borrar #{port}", callback_data: "delete_game! #{port}"},{text: "#{port} Who is who?", callback_data: "who_is_who #{port}" }]
       else
         [{text: "-", callback_data: "nope" },{text: "Crear #{port}", callback_data: "create_game! #{port}"},]
       end
