@@ -23,8 +23,8 @@ module GamesUtils
     game = Game.find_by port: port
     unless game.nil?
       answer = game.player_games.map do |pg|
-        game_status << "*#{nation_name(pg.nation)}:* @#{pg.player.username}\n"
-      end
+        "*#{nation_name(pg.nation)}:* @#{pg.player.username}\n"
+      end.flatten.join ' - '
       respond_with :message, text: answer, parse_mode: :Markdown
     else
       respond_with :message, text: "Payo, no veo a nadie para esa partida (#{port})", parse_mode: :Markdown
