@@ -51,12 +51,10 @@ class Dominions4botController < Telegram::Bot::UpdatesController
   #tells the player in which games she/he has pending turns
   def need_drugs!
     pgs = PlayerGame.where player: @player
-    drugs = pgs.map do |pg|
-      port = pg.gm_port
-      ["#{port}: #{find_nation_status(1024,pg.nation)}"]
-    end.flatten.join "\n"
-    respond_with :message, text: drugs
 
+    drugs = pgs.map { |p| ["#{p.gm_port}: #{find_nation_status(p.gm_port,p.nation)}"] }.flatten.join "\n"
+
+    respond_with :message, text: drugs
   end
 
   def im_playing_in(port)
