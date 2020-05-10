@@ -8,7 +8,7 @@ module GamesUtils
       if Game.exists? port: port
         [{text: "Borrar #{port}", callback_data: "delete_game! #{port}"},{text: "Who is who in #{port}?", callback_data: "who_is_who #{port}" }]
       else
-        [{text: "Who is who in #{port}?", callback_data: "who_is_who #{port}" },{text: "Crear #{port}", callback_data: "create_game! #{port}"},]
+        [{text: "-", callback_data: "nope" },{text: "Crear #{port}", callback_data: "create_game! #{port}"},]
       end
     end
 
