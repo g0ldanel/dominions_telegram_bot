@@ -67,25 +67,6 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     respond_with :message, text: "¿quién eres en #{port}?", reply_markup: {inline_keyboard:  answers}
   end
 
-
-  # #old
-  # def status(port)
-  #   status = game_status port
-
-  #   game_players(port).scan(/([A-Za-z]{1,2}[a-z]{0,}[-?*+])/).each do |player|
-  #     nation = player.last[0...-1]
-  #     pg = PlayerGame.find_by nation: nation, game: port
-  #     nation_status =  player_status(player.last.last.last)
-  #     unless pg.nil? || nation_status == "Jugado"
-  #       nation += " @#{pg.username}"
-  #     end
-  #     status << "\n *#{nation_name(nation)}:* #{nation_status}"
-  #   end
-
-  #   respond_with :message, text: status, parse_mode: :Markdown
-  # end
-
-
   #new
   def status(port)
     game_status = ''
