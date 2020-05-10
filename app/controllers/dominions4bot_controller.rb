@@ -54,7 +54,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
 
     drugs = pgs.map { |p| ["#{p.gm_port}: #{find_nation_status(p.gm_port,p.nation)}"] }.flatten.join "\n"
 
-    respond_with :message, text: "Hola #{@username}, tus dronjas:\n #{drugs}"
+    respond_with :message, text: "Hola #{@username}, tus dronjas:\n#{drugs}"
   end
 
   def im_playing_in(port)
