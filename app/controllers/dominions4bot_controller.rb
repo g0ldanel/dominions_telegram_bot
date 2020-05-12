@@ -116,8 +116,9 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     end
   end
 
-  def player_status(status)
-   case(status)
+  def player_status(raw_status)
+   #TODO make an enum with this
+   case(raw_status)
    when "+"
      "Jugado"
    when "?"
@@ -127,7 +128,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
    when "*"
      "*Conectado*"
    else
-     status
+     raw_status
    end
   end
 
@@ -142,11 +143,12 @@ class Dominions4botController < Telegram::Bot::UpdatesController
   end
 
   def set_msg
-   @msg =  update["message"]["from"]["text"] || update["message"]["text"]
-   if (@msg =~ /[ ]/).nil? then
-     @msg = nil
+   raw_msg =  update["message"]["from"]["text"] || update["message"]["text"]
+
+   @msg = if (raw_msg=~ /[ ]/).nil? then
+     nil
    else
-     @msg = @msg[((@msg =~ /[ ]/) + 1)..@msg.length]
+     raw_msg[((raw_msg =~ /[ ]/) + 1)..raw_msg.length]
    end
   end
 

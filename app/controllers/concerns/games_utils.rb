@@ -1,10 +1,10 @@
 module GamesUtils
   extend ActiveSupport::Concern
-  PORTS = (1024..1029).to_a
+  #PORTS = (1024..1029).to_a
 
 
   def select_game!
-    games = PORTS.map do |port|
+    games = Dominions4botController::PORTS.map do |port|
       if Game.exists? port: port
         [{text: "Borrar #{port}", callback_data: "delete_game! #{port}"},{text: "#{port} Who is who?", callback_data: "who_is_who #{port}" }]
       else
@@ -12,7 +12,8 @@ module GamesUtils
       end
     end
 
-    respond_with :message, text: "Selecciona:\n _Borrar una partida del bot solo hara que deje de leer su estado_", reply_markup: {inline_keyboard:  games}, parse_mode: :Markdown
+    respond_with :message, text: "Selecciona:\n _Borrar una partida del bot solo hara que deje de leer su estado_",
+                  reply_markup: {inline_keyboard:  games}, parse_mode: :Markdown
   end
 
 
@@ -24,7 +25,7 @@ module GamesUtils
     unless game.nil?
       answer = game.player_games.map do |pg|
         " - *#{nation_name(pg.nation)}:* #{pg.player.username}\n"
-      end.flatten.join ''
+      end.join ''
       respond_with :message, text: "#{port}:\n#{answer}", parse_mode: :Markdown
     else
       respond_with :message, text: "Payo, no veo a nadie para esa partida (#{port})", parse_mode: :Markdown

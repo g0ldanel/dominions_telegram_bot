@@ -1,4 +1,5 @@
 class Game < ActiveRecord::Base
+  #TODO enum for eras
   validates_presence_of :name
   validates_presence_of :era
   validates :port, numericality: { greater_than: 0, less_than: 25000 }
