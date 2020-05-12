@@ -6,4 +6,9 @@ module MapUtils
 
   end
 
+
+  def read_dat_map
+    #TODO read dom map picture and stream it to telegram
+  end
+
 end

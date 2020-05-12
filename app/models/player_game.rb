@@ -1,4 +1,7 @@
 class PlayerGame < ActiveRecord::Base
-  validates_presence_of :username
-  validates_presence_of :game
+  belongs_to :game
+  belongs_to :player
+  validates_presence_of :nation
+  delegate :name, :port, to: :game, prefix: :gm
+
 end
