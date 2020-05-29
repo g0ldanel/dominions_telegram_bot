@@ -90,6 +90,15 @@ class Dominions4botController < Telegram::Bot::UpdatesController
 
 
   def action_missing(action, *_args)
+    action_text = _args[0]['text'].split('@')[0][0..]
+
+    if action_text[0] == '/'
+      action_text += '!'
+      send action_text[1..]
+    else
+      respond_with :message, text: "A mi que me cuentas, diselo a Pedro que fijo que es culpa suya"
+    end
+  rescue
     respond_with :message, text: "Eso no se que es"
   end
 
@@ -116,8 +125,9 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     end
   end
 
-  def player_status(status)
-   case(status)
+  def player_status(raw_status)
+   #TODO make an enum with this
+   case(raw_status)
    when "+"
      "Jugado"
    when "?"
@@ -127,7 +137,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
    when "*"
      "*Conectado*"
    else
-     status
+     raw_status
    end
   end
 
@@ -142,11 +152,12 @@ class Dominions4botController < Telegram::Bot::UpdatesController
   end
 
   def set_msg
-   @msg =  update["message"]["from"]["text"] || update["message"]["text"]
-   if (@msg =~ /[ ]/).nil? then
-     @msg = nil
+   raw_msg =  update["message"]["from"]["text"] || update["message"]["text"]
+
+   @msg = if (raw_msg=~ /[ ]/).nil? then
+     nil
    else
-     @msg = @msg[((@msg =~ /[ ]/) + 1)..@msg.length]
+     raw_msg[((raw_msg =~ /[ ]/) + 1)..raw_msg.length]
    end
   end
 
