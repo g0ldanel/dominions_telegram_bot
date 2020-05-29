@@ -90,6 +90,15 @@ class Dominions4botController < Telegram::Bot::UpdatesController
 
 
   def action_missing(action, *_args)
+    action_text = _args[0]['text'].split('@')[0][0..]
+
+    if action_text[0] == '/'
+      action_text += '!'
+      send action_text[1..]
+    else
+      respond_with :message, text: "A mi que me cuentas, diselo a Pedro que fijo que es culpa suya"
+    end
+  rescue
     respond_with :message, text: "Eso no se que es"
   end
 
