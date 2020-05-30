@@ -1,6 +1,14 @@
 # coding: utf-8
 class Dominions4botController < Telegram::Bot::UpdatesController
   rescue_from Exception, :with => :log_error
+  EXCUSES = [ "A mi que me cuentas, diselo a Pedro que fijo que es culpa suya",
+              "Yo que sé, ataca a Dani",
+              "No dejes que Tien Chi llegue al late game",
+              "Aco? Sí sí, claro que iba a jugar",
+              "Recuerda, un Panda siempre paga sus deudas",
+              "No le hagas caso",
+              "Creo que te voy a ignorar eso que has dicho",
+              "¿Te has tomado la pastilla del TOC hoy?"]
   PORTS = (1024..1029).to_a
   include Telegram::Bot::UpdatesController::MessageContext
   include StatsUtils
@@ -96,7 +104,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
       action_text += '!'
       send action_text[1..]
     else
-      respond_with :message, text: "A mi que me cuentas, diselo a Pedro que fijo que es culpa suya"
+      respond_with :message, text: EXCUSES.sample
     end
   rescue
     respond_with :message, text: "Eso no se que es"
