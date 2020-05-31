@@ -33,7 +33,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     end
 
     define_method("status_#{i}!") do
-      respond_with :message, text: "Status #{i}:\n #{status(i)}"
+      respond_with :message, text: "Status #{i}:\n #{status(i)}", parse_mode: :Markdown
     end
   end
 
@@ -80,6 +80,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     game_status = ''
     lines = File.readlines("/tmp/#{port}.log", chomp: true).last(2)
     game_status << lines.first
+    game_status.gsub! '_',''
     lines[1].scan(/([A-Za-z]{1,2}[a-z]{0,2}[-?*+])/).each do |nation_line|
       nation = nation_line.last[0...-1]
 
