@@ -189,7 +189,6 @@ class Dominions4botController < Telegram::Bot::UpdatesController
   end
 
   def set_player
-byebug
     @player = Player.find_or_create_by username: @username
   end
 
