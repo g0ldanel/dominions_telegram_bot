@@ -75,6 +75,14 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     respond_with :message, text: "¿quién eres en #{port}?", reply_markup: {inline_keyboard:  answers}
   end
 
+  def status!
+    games = Game.all
+    options = games.map do |game|
+      [{text: "#{game.port} game - #{game.name}", callback_data: "status_#{game.port}!"}]
+    end
+    respond_with :message, text: "Available games:", reply_markup: {inline_keyboard:  options}
+  end
+
   #new
   def status(port)
     game_status = ''
