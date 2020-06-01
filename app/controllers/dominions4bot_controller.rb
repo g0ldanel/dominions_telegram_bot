@@ -32,7 +32,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
       respond_with :message, text: "¿quién eres en #{i}?", reply_markup: {inline_keyboard:  im_playing_in(i)}
     end
 
-    define_method("status_#{i}!") do
+    define_method("status_#{i}!") do |args|
       respond_with :message, text: "Status #{i}:\n #{status(i)}", parse_mode: :Markdown
     end
   end
