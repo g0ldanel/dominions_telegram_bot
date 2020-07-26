@@ -91,7 +91,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
   def status(port)
     game_status = "#{Hola @username}:\n"
     lines = File.readlines("/tmp/#{port}.log", chomp: true).last(2)
-    return lines if lines.join(' ').include? 'Setup' # if server is not in turns mode, just give back info available
+    return lines.join('\n') if lines.join(' ').include? 'Setup' # if server is not in turns mode, just give back info available
     game_status << lines.first
     game_status.gsub! '_',''
     lines[1].scan(/([A-Za-z]{1,2}[a-z]{0,2}[-?*+])/).each do |nation_line|
