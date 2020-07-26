@@ -1,6 +1,6 @@
 # coding: utf-8
 class Dominions4botController < Telegram::Bot::UpdatesController
-  rescue_from Exception, :with => :log_error
+  #rescue_from Exception, :with => :log_error
   EXCUSES = [ "A mi que me cuentas, diselo a Pedro que fijo que es culpa suya",
               "Yo que sé, ataca a Dani",
               "No dejes que Tien Chi llegue al late game",
@@ -32,7 +32,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
       respond_with :message, text: "¿quién eres en #{i}?", reply_markup: {inline_keyboard:  im_playing_in(i)}
     end
 
-    define_method("status_#{i}!") do |args|
+    define_method("status_#{i}!") do
       respond_with :message, text: "Status #{i}:\n #{status(i)}", parse_mode: :Markdown
     end
   end
@@ -40,7 +40,11 @@ class Dominions4botController < Telegram::Bot::UpdatesController
 
   def callback_query(data)
     order = data.split
-    send order[0], order[1]
+    begin
+      send order[0], order[1]
+    rescue
+      send order[0]
+    end
   end
 
   def soy!(player_game)
@@ -113,7 +117,8 @@ class Dominions4botController < Telegram::Bot::UpdatesController
       action_text += '!'
       send action_text[1..]
     else
-      respond_with :message, text: EXCUSES.sample
+
+      respond_with :message, text: EXCUSES.sample if action.start_with '/'
     end
   rescue
     respond_with :message, text: "Eso no se que es"
