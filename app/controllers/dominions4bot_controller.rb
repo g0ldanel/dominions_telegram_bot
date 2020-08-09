@@ -37,6 +37,17 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     end
   end
 
+  def comova!
+      respond_with :message, text: "Status #{"2042"}:\n #{status("2042")}", parse_mode: :Markdown
+  end
+
+  def daleahi!
+    system "echo settimeleft 10 > ~/.dominions5/savedgames/bootcamp/domcmd"
+    respond_with :message, text: "Ya voy, ya voy! 10 segundos para host\n", parse_mode: :Markdown
+    (10..1).each do |i|
+      respond_with :message, text: "#{i}\n", parse_mode: :Markdown
+    end
+  end
 
   def callback_query(data)
     order = data.split
