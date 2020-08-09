@@ -47,6 +47,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     (10..1).each do |i|
       respond_with :message, text: "#{i}\n", parse_mode: :Markdown
     end
+    respond_with :message, text: "host, reclutas!"
   end
 
   def callback_query(data)
