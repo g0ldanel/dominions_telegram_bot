@@ -41,10 +41,20 @@ class Dominions4botController < Telegram::Bot::UpdatesController
       respond_with :message, text: "Status #{"2042"}:\n #{status("2042")}", parse_mode: :Markdown
   end
 
+  def botonaso!(port)
+    if @username != 'g0ldan'
+      respond_with :message, text: "Uy, uy, uy. No toques las cosas de los mayores, y diselo a @g0ldan!\n", parse_mode: :Markdown
+    else
+      game = Game.find_by port: port
+      system "echo settimeleft 10 > ~/.dominions5/savedgames/#{game.name}/domcmd"
+      respond_with :message, text: "Ea, ya. Siempre esperando por el mismo.\n\n#{EXCUSES.sample}", parse_mode: :Markdown
+    end
+  end
+
   def daleahi!
     system "echo settimeleft 10 > ~/.dominions5/savedgames/bootcamp/domcmd"
     respond_with :message, text: "Ya voy, ya voy! 10 segundos para host\n", parse_mode: :Markdown
-    (10..1).each do |i|
+    (1..10).each do |i|
       respond_with :message, text: "#{i}\n", parse_mode: :Markdown
     end
     respond_with :message, text: "host, reclutas!"
@@ -116,6 +126,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
       end
       game_status << "\n *#{nation_name(nation)}:* #{nation_status}"
     end
+
     game_status
   rescue => e
     Logger.new(STDOUT).error "Ups! Doing status #{port} got: #{e.message}"
@@ -178,6 +189,10 @@ class Dominions4botController < Telegram::Bot::UpdatesController
 
   def nation_name(acron)
    NATIONS[acron] || acron
+  end
+
+  def game_name(line)
+    line[0,line.index(',')]
   end
 
   def connect_db
