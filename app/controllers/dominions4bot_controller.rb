@@ -46,7 +46,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
       respond_with :message, text: "Uy, uy, uy. No toques las cosas de los mayores, y diselo a @g0ldan!\n", parse_mode: :Markdown
     else
       game = Game.find_by port: port
-      system "echo settimeleft 10 > ~/.dominions5/savedgames/#{game.name}/domcmd"
+      system "echo setinterval 1440 > ~/.dominions5/savedgames/#{game.name}/domcmd"
       respond_with :message, text: "Ea, ya. Siempre esperando por el mismo.\n\n#{EXCUSES.sample}", parse_mode: :Markdown
     end
   end
