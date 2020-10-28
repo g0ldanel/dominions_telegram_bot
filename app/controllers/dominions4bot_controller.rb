@@ -38,7 +38,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
   end
 
   def comova!
-      respond_with :message, text: "Status #{"2042"}:\n #{status("2042")}", parse_mode: :Markdown
+      respond_with :message, text: "Status #{"2042"}:\n #{status("2042")}\n\n#{status('2043')}", parse_mode: :Markdown
   end
 
   def botonaso!(port)
@@ -52,7 +52,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
   end
 
   def daleahi!
-    system "echo settimeleft 10 > ~/.dominions5/savedgames/bootcamp/domcmd"
+    system "echo settimeleft 10 > ~/.dominions5/savedgames/bootcamp_early3/domcmd"
     respond_with :message, text: "Ya voy, ya voy! 10 segundos para host\n", parse_mode: :Markdown
     (1..10).each do |i|
       respond_with :message, text: "#{i}\n", parse_mode: :Markdown
@@ -70,7 +70,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
   end
 
   def soy!(player_game)
-    arr = player_game.split "@"
+    arr = player_game.split "__"
     nation = arr.first
     port = arr.last
     game = Game.find_by port: port
@@ -95,7 +95,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     players = playing_nations port
 
     answers = players.map do |player|
-      [{text: "Soy #{player[0...-1]}", callback_data: "soy! #{player[0...-1]}@#{port}"}]
+      [{text: "Soy #{player[0...-1]}", callback_data: "soy! #{player[0...-1]}__#{port}"}]
     end
 
     respond_with :message, text: "¿quién eres en #{port}?", reply_markup: {inline_keyboard:  answers}
@@ -136,7 +136,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
 
   def action_missing(action, *_args)
     action_text = _args[0]['text'].split('@')[0][0..]
-
+    Logger.new(STDOUT).info "action text: #action_text"
     if action_text[0] == '/'
       action_text += '!'
       send action_text[1..]
