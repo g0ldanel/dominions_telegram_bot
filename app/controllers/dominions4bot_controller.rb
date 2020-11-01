@@ -139,7 +139,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
       game_status << "\n *#{nation_name(nation)}:* #{nation_status}"
     end
 
-    game_status += whos_guilty(game_status.scan(/(@[A-Z])\w+/).first) if game_status.count('@') == 1
+    game_status +="\n\n #{whos_guilty(game_status.scan(/(@[A-Za-z0-9])\w+/).first)} "if game_status.count('@') == 1
 
     game_status
   rescue => e
