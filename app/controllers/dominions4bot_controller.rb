@@ -178,6 +178,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
       'Amo, amo! Se bueno con ellos! No se lo merecen, pero muestrales tu misericordia!'
     else
       "La gente necesita dronjas #{player_name}"
+    end
   end
 
   def find_nation_status(port, nation)
