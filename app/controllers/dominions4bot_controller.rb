@@ -139,6 +139,8 @@ class Dominions4botController < Telegram::Bot::UpdatesController
       game_status << "\n *#{nation_name(nation)}:* #{nation_status}"
     end
 
+    game_status += whos_guilty(game_status.scan(/(@[A-Z])\w+/).first) if game_status.count('@') == 1
+
     game_status
   rescue => e
     Logger.new(STDOUT).error "Ups! Doing status #{port} got: #{e.message}"
@@ -165,6 +167,18 @@ class Dominions4botController < Telegram::Bot::UpdatesController
   end
 
   private
+
+  def whos_guilty(player_name)
+    case player_name
+    when '@Tr0b1n'
+      'Que alguien despierte al Abuelo que se la ha pasado el turno(otra vez)!'
+    when '@R7K7B'
+      'De quien es la culpa de que no haya turnooooo...???'
+    when '@g0ldan'
+      'Amo, amo! Se bueno con ellos! No se lo merecen, pero muestrales tu misericordia!'
+    else
+      "La gente necesita dronjas #{player_name}"
+  end
 
   def find_nation_status(port, nation)
     nations = playing_nations port
