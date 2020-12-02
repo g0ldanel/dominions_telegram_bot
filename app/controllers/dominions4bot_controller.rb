@@ -186,7 +186,8 @@ class Dominions4botController < Telegram::Bot::UpdatesController
       respond_with :message, text: "Puedes buscar por #{DEFAULT_TERMS.join(', ')};\nPorfi incluye términos de búsqueda :)"
     else
       search = search_terms.join(' ')
-      link = "https://larzm42.github.io/dom5inspector/?page=#{page}&#{page}q=#{search}"
+      args = { page: page, :"#{page}q" => search }
+      link = "https://larzm42.github.io/dom5inspector/?#{args.to_query}"
       respond_with :message, text: link, parse_mode: :Markdown
     end
   end
