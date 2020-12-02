@@ -280,7 +280,7 @@ logger.info "\n\n\n\n\n\n #{player_name}\n\n\n\n\n\n"
     area = search_terms.shift if search_terms.length > 2
     page = SEARCH_TERMS[area] if area
     if page.nil?
-      respond_with :message, text "Puedes buscar por #{DEFAULT_TERMS.join(', ')};\nPorfi incluye términos de búsqueda :)"
+      respond_with :message, text: "Puedes buscar por #{DEFAULT_TERMS.join(', ')};\nPorfi incluye términos de búsqueda :)"
     else
       search = search_terms.join(' ')
       link = "https://larzm42.github.io/dom5inspector/?page=#{page}&#{page}q=#{search}"
