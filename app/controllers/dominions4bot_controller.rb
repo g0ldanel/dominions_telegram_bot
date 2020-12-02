@@ -169,6 +169,10 @@ class Dominions4botController < Telegram::Bot::UpdatesController
   def whos_guilty(player_name)
 logger.info "\n\n\n\n\n\n #{player_name}\n\n\n\n\n\n"
     case player_name
+    when '@blulaktuko'
+      'En Alemania no pasaban estas cosas con el Caudillo'
+    when '@ClubbingSealCub'
+      'No te lo pienses tanto, si total, sabes que es pique de maquina'
     when '@Tr0b1n'
       'Que alguien despierte al Abuelo que se la ha pasado el turno(otra vez)!'
     when '@R7K7B'
