@@ -273,7 +273,8 @@ logger.info "\n\n\n\n\n\n #{player_name}\n\n\n\n\n\n"
   DEFAULT_TERMS = INSPECTOR_TABS.map {|_, vs| vs.first }
 
   def busca!(*search_terms)
-    page = search_terms.shift if search_terms.length > 2
+    area = search_terms.shift if search_terms.length > 2
+    page = SEARCH_TERMS[area] if area
     if page.nil?
       respond_with :message, text "Puedes buscar por #{DEFAULT_TERMS.join(', ')};\nPorfi incluye términos de búsqueda :)"
     else
