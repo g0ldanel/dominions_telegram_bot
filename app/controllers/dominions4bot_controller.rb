@@ -265,7 +265,7 @@ logger.info "\n\n\n\n\n\n #{player_name}\n\n\n\n\n\n"
     merc: %w{merc m mercenaries mercenary mercenario mercenarios},
     event: %w{event e eventos}
   }
-  # somos flexibles con las categorías de búsqueda
+  # we're flexible with the search areas used
   SEARCH_TERMS = INSPECTOR_TABS.map do |k, vs|
     vs.map { |v| [v, k.to_s] }
   end.flatten(1).to_h
