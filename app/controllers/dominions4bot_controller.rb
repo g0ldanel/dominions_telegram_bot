@@ -256,4 +256,30 @@ logger.info "\n\n\n\n\n\n #{player_name}\n\n\n\n\n\n"
     respond_with :message, text: "Ups!\n\n```#{e.message}```\nNada que ver, circulen...", parse_mode: :Markdown
   end
 
+
+  INSPECTOR_TABS = {
+    item: %w{item i objeto},
+    spell: %w{spell s hechizo},
+    unit: %w{unit u unidad},
+    site: %w{site s lugar},
+    merc: %w{merc m mercenaries mercenary mercenario mercenarios},
+    event: %w{event e eventos}
+  }
+  # somos flexibles con las categorías de búsqueda
+  SEARCH_TERMS = INSPECTOR_TABS.map do |k, vs|
+    vs.map { |v| [v, k.to_s] }
+  end.flatten(1).to_h
+
+  DEFAULT_TERMS = INSPECTOR_TABS.map {|_, vs| vs.first }
+
+  def busca!(*search_terms)
+    page = search_terms.shift if search_terms.length > 2
+    if page.nil?
+      respond_with :message, text "Puedes buscar por #{DEFAULT_TERMS.join(', ')};\nPorfi incluye términos de búsqueda :)"
+    else
+      search = search_terms.join(' ')
+      link = "https://larzm42.github.io/dom5inspector/?page=#{page}&#{page}q=#{search}"
+      respond_with :message, text: link, parse_mode: :Markdown
+    end
+  end
 end
