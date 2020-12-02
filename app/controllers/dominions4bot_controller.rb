@@ -4,7 +4,6 @@ class Dominions4botController < Telegram::Bot::UpdatesController
   EXCUSES = [ "A mi que me cuentas, diselo a Pedro que fijo que es culpa suya",
               "Yo que sé, ataca a Dani",
               "No dejes que Tien Chi llegue al late game",
-              "Aco? Sí sí, claro que iba a jugar",
               "Recuerda, un Panda siempre paga sus deudas",
               "No le hagas caso",
               "Creo que te voy a ignorar eso que has dicho",
