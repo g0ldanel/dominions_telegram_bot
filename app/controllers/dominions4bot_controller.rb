@@ -180,7 +180,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
   DEFAULT_TERMS = INSPECTOR_TABS.map {|_, vs| vs.first }
 
   def busca!(*search_terms)
-    area = search_terms.shift if search_terms.length > 2
+    area = search_terms.shift if search_terms.length > 1
     page = SEARCH_TERMS[area] if area
     if page.nil?
       respond_with :message, text: "Puedes buscar por #{DEFAULT_TERMS.join(', ')};\nPorfi incluye términos de búsqueda :)"
