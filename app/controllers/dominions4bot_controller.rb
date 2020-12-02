@@ -164,6 +164,33 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     respond_with :message, text: read_scores_file_1028, parse_mode: "html"
   end
 
+  INSPECTOR_TABS = {
+    item: %w{item i objeto},
+    spell: %w{spell s hechizo},
+    unit: %w{unit u unidad},
+    site: %w{site s lugar},
+    merc: %w{merc m mercenaries mercenary mercenario mercenarios},
+    event: %w{event e eventos}
+  }
+  # we're flexible with the search areas used
+  SEARCH_TERMS = INSPECTOR_TABS.map do |k, vs|
+    vs.map { |v| [v, k.to_s] }
+  end.flatten(1).to_h
+
+  DEFAULT_TERMS = INSPECTOR_TABS.map {|_, vs| vs.first }
+
+  def busca!(*search_terms)
+    area = search_terms.shift if search_terms.length > 2
+    page = SEARCH_TERMS[area] if area
+    if page.nil?
+      respond_with :message, text: "Puedes buscar por #{DEFAULT_TERMS.join(', ')};\nPorfi incluye términos de búsqueda :)"
+    else
+      search = search_terms.join(' ')
+      link = "https://larzm42.github.io/dom5inspector/?page=#{page}&#{page}q=#{search}"
+      respond_with :message, text: link, parse_mode: :Markdown
+    end
+  end
+
   private
 
   def whos_guilty(player_name)
@@ -258,33 +285,5 @@ logger.info "\n\n\n\n\n\n #{player_name}\n\n\n\n\n\n"
   def log_error(e)
     Logger.new(STDOUT).error "\n********************\nUps! Exception raised, got: #{e.message}\n********************\n"
     respond_with :message, text: "Ups!\n\n```#{e.message}```\nNada que ver, circulen...", parse_mode: :Markdown
-  end
-
-
-  INSPECTOR_TABS = {
-    item: %w{item i objeto},
-    spell: %w{spell s hechizo},
-    unit: %w{unit u unidad},
-    site: %w{site s lugar},
-    merc: %w{merc m mercenaries mercenary mercenario mercenarios},
-    event: %w{event e eventos}
-  }
-  # we're flexible with the search areas used
-  SEARCH_TERMS = INSPECTOR_TABS.map do |k, vs|
-    vs.map { |v| [v, k.to_s] }
-  end.flatten(1).to_h
-
-  DEFAULT_TERMS = INSPECTOR_TABS.map {|_, vs| vs.first }
-
-  def busca!(*search_terms)
-    area = search_terms.shift if search_terms.length > 2
-    page = SEARCH_TERMS[area] if area
-    if page.nil?
-      respond_with :message, text: "Puedes buscar por #{DEFAULT_TERMS.join(', ')};\nPorfi incluye términos de búsqueda :)"
-    else
-      search = search_terms.join(' ')
-      link = "https://larzm42.github.io/dom5inspector/?page=#{page}&#{page}q=#{search}"
-      respond_with :message, text: link, parse_mode: :Markdown
-    end
   end
 end
