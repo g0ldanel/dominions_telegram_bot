@@ -180,8 +180,6 @@ class Dominions4botController < Telegram::Bot::UpdatesController
   DEFAULT_TERMS = INSPECTOR_TABS.map {|_, vs| vs.first }
 
   def busca!(*search_terms)
-    puts search_terms.inspect
-    puts search_terms.length
     area = search_terms.shift if search_terms.length > 1
     page = SEARCH_TERMS[area] if area
     if page.nil?
