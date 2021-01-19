@@ -29,6 +29,12 @@ module DataClient
       "#{mp}#{mpl.level}"
     end
 
+    def from_gem_cost(gc)
+      return if gc.nil?
+      n = from_magic_path_brief(gc.magicPath.name)
+      "#{n}#{gc.amount}"
+    end
+
     def from_spell(s)
       nations = s.restrictedToNations.map(&method(:from_nation_brief)).join(', ')
       n = (nations.length.nil? || nil) && "Restricted to: #{nations}"
@@ -36,8 +42,12 @@ module DataClient
       [["*#{s.name}* (_#{s.id}_)",
         from_magic_school_level(s.magicSchoolLevel)].compact.join(", "),
        s.magicPathLevels.map(&method(:from_magic_path_level)).join,
+       ["Fat: #{s.fatigueCost}", "Dam: #{s.damage}",
+        "Pre: #{s.precision}", from_gem_cost(s.gemCost)].compact.join(", "),
        n,
-       s.description.strip.split.map{|l| "_#{l.strip}_" }.join("\n"),
+       [s.description, s.details && "_Details:_\n#{s.details}"].map do |str|
+         str.split.map(&:strip)
+       end.join("\n")
       ].compact.join("\n")
     end
   end

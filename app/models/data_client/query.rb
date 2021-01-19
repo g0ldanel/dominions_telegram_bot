@@ -8,7 +8,17 @@ module DataClient
           spells(name: n) {
             id
             name
+            fatigueCost
+            gemCost {
+              amount
+              magicPath {
+                name
+              }
+            }
             description
+            details
+            damage
+            precision
             magicSchoolLevel {
               magicSchool {
                 name
