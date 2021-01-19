@@ -1,5 +1,7 @@
 # coding: utf-8
 class Dominions4botController < Telegram::Bot::UpdatesController
+  include ::DataClient::View
+
   #rescue_from Exception, :with => :log_error
   EXCUSES = [ "A mi que me cuentas, diselo a Pedro que fijo que es culpa suya",
               "Yo que sé, ataca a Dani",
@@ -180,15 +182,24 @@ class Dominions4botController < Telegram::Bot::UpdatesController
   DEFAULT_TERMS = INSPECTOR_TABS.map {|_, vs| vs.first }
 
   def busca!(*search_terms)
-    area = search_terms.shift if search_terms.length > 1
-    page = SEARCH_TERMS[area] if area
-    if page.nil?
+    sent_area = search_terms.shift if search_terms.length > 1
+    area = SEARCH_TERMS[sent_area] if sent_area
+
+    if area.nil?
       respond_with :message, text: "Puedes buscar por #{DEFAULT_TERMS.join(', ')};\nPorfi incluye términos de búsqueda :)"
     else
       search = search_terms.join(' ')
-      args = { page: page, :"#{page}q" => search }
-      link = "https://larzm42.github.io/dom5inspector/?#{args.to_query}"
-      respond_with :message, text: link, parse_mode: :Markdown
+      inspector_args = { page: area, :"#{area}q" => search }
+      server_results =
+        case area
+        when 'spell'
+          s = GraphQL.send(DataClient::Query.spells).data.spells
+          s.map(method(:from_spell)).join('\n\n')
+        end
+
+      link = "https://larzm42.github.io/dom5inspector/?#{inspector_args.to_query}"
+      message = ["#{link}", server_results].join('\n')
+      respond_with :message, text: message, parse_mode: :Markdown
     end
   end
 
