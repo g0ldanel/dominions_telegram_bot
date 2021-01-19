@@ -200,8 +200,10 @@ class Dominions4botController < Telegram::Bot::UpdatesController
         end
 
       link = "https://larzm42.github.io/dom5inspector/?#{inspector_args.to_query}"
-      message = ["#{link}", server_results].compact.join("\n")
-      respond_with :message, text: message, parse_mode: :Markdown
+
+      message = ["[Inspector page for \"#{search}\"](#{link})",
+                 server_results].compact.join("\n\n")
+      respond_with :message, text: message, parse_mode: :MarkdownV2
     end
   end
 
