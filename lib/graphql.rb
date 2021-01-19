@@ -8,8 +8,8 @@ class GraphQL
   end
 
   private
-  def self.client
-    @client ||= GQLi::Client.new(Rails.application.secrets.graphql[:url],
+  def client
+    @client ||= GQLi::Client.new(Rails.secrets.graphql[:url],
                                  validate_query: false)
   end
 end

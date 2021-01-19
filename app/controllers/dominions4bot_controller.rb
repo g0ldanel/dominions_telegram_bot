@@ -1,4 +1,6 @@
 # coding: utf-8
+require 'graphql'
+
 class Dominions4botController < Telegram::Bot::UpdatesController
   include ::DataClient::View
 
@@ -193,12 +195,12 @@ class Dominions4botController < Telegram::Bot::UpdatesController
       server_results =
         case area
         when 'spell'
-          s = GraphQL.send(DataClient::Query.spells).data.spells
-          s.map(method(:from_spell)).join('\n\n')
+          s = GraphQL.send(DataClient::Query.spells(search)).data.spells
+          s.map(&method(:from_spell)).join("\n\n")
         end
 
       link = "https://larzm42.github.io/dom5inspector/?#{inspector_args.to_query}"
-      message = ["#{link}", server_results].join('\n')
+      message = ["#{link}", server_results].compact.join("\n")
       respond_with :message, text: message, parse_mode: :Markdown
     end
   end

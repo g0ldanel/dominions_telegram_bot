@@ -18,26 +18,26 @@ module DataClient
     end
 
     def from_magic_school_level(msl)
-      "" unless msl
+      return "" if msl.nil?
       ms = msl.magicSchool.name
       "#{ms} #{msl.level}"
     end
 
     def from_magic_path_level(mpl)
-      "" unless mpl.level > 0
-      mp = from_magic_path_brief(msl.magicPath.name)
+      return "" if mpl.level.zero?
+      mp = from_magic_path_brief(mpl.magicPath.name)
       "#{mp}#{mpl.level}"
     end
 
     def from_spell(s)
-      nations = s.restrictedToNations.map(method(:from_nation_brief)).join(', ')
+      nations = s.restrictedToNations.map(&method(:from_nation_brief)).join(', ')
       n = (nations.length.nil? || nil) && "Restricted to: #{nations}"
 
-      ["**#{s.name}** (*#{s.id}*), #{fromMagicSchoollevel(s.magicSchoollevel)}",
-       s.magicPathLevels.map(method(:from_magic_path_level)).join,
+      ["**#{s.name}** (*#{s.id}*), #{from_magic_school_level(s.magicSchoolLevel)}",
+       s.magicPathLevels.map(&method(:from_magic_path_level)).join,
        n,
-       "*#{s.description}*",
-      ].join('\n')
+       "*#{s.description.strip}*",
+      ].compact.join("\n")
     end
   end
 end
