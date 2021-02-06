@@ -58,7 +58,7 @@ module DataClient
         "Precision: #{s.precision}", "Cost: #{from_gem_cost(s.gemCost)}"].compact.join(', '),
        n,
        [s.description, s.details && "_Details:_\n#{s.details}"].map do |str|
-         str.split("\n").map(&:strip)
+         str.to_s.split("\n").map(&:strip)
        end.join("\n")].compact.join("\n")
     end
   end
