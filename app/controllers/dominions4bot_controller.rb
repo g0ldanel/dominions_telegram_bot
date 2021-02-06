@@ -191,7 +191,7 @@ class Dominions4botController < Telegram::Bot::UpdatesController
       respond_with :message, text: "Puedes buscar por #{DEFAULT_TERMS.join(', ')};\nPorfi incluye términos de búsqueda :)"
     else
       search = search_terms.join(' ')
-      inspector_args = { page: area, :"#{area}q" => search }
+      inspector_args = { page: area, "#{area}q": search }
       server_results =
         case area
         when 'spell'
@@ -201,8 +201,8 @@ class Dominions4botController < Telegram::Bot::UpdatesController
 
       link = "https://larzm42.github.io/dom5inspector/?#{inspector_args.to_query}"
 
-      message = ["[Inspector page for \"#{search}\"](#{link})",
-                 server_results].compact.join("\n\n")
+      message = [clean(link),
+                 clean(server_results)].compact.join("\n\n")
       respond_with :message, text: message, parse_mode: :MarkdownV2
     end
   end
