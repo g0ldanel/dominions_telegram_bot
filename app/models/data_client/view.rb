@@ -6,7 +6,7 @@ module DataClient
     # that will use MarkdownV2 as return format. For now, though, this is only
     # used here.
     def clean(str)
-      str.gsub(/([()~`>#+-=|{}.!\[\].])/, '\\\\\1')
+      str.to_s.gsub(/([()~`>#+-=|{}.!\[\].])/, '\\\\\1')
     end
 
     def from_magic_path_brief(name)
