@@ -1,9 +1,9 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '~>3.0'
+ruby '~>3.0.0'
 
-gem 'telegram-bot', github: 'telegram-bot-rb/telegram-bot', branch: 'ruby-3.0'
+gem 'telegram-bot', github: 'telegram-bot-rb/telegram-bot'
 gem 'nokogiri'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
@@ -38,6 +38,8 @@ gem 'jbuilder', '~> 2.5'
 
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.1.0', require: false
+
+gem 'gqli'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
