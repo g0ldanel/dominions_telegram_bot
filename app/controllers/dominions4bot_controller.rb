@@ -54,6 +54,17 @@ class Dominions4botController < Telegram::Bot::UpdatesController
     end
   end
 
+  def reinicia!(port)
+    if @username != 'g0ldan'
+      respond_with :message, text: "Uy, uy, uy. No toques las cosas de los mayores, y diselo a @g0ldan!\n", parse_mode: :Markdown
+    else
+      game = Game.find_by port: port
+      system "ps ax |grep #{port} | awk '{print $1}' | xargs kill -9"
+      system "sh /var/projects/dominions_scripts/#{port}.sh &"
+      respond_with :message, text: "Ea, ya. Siempre esperando por el mismo.\n\n#{EXCUSES.sample}", parse_mode: :Markdown
+    end
+  end
+
 
   def dalealotro!
     system "echo settimeleft 10 > ~/.dominions5/savedgames/bootcamp_early3BIS/domcmd"
